@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="19.05.0.0">
+<procedure name="main">
+<interface/>
+<body>
+<l>dev_get_window (WindowHandle)</l>
+<l>dev_set_draw ('margin')</l>
+<l>set_line_width (WindowHandle, 1)</l>
+<c></c>
+<l>info_framegrabber ('DirectShow', 'device', Information, ValueList)</l>
+<l>if (|ValueList| &gt;0)</l>
+<l>    open_framegrabber ('DirectShow', 1, 1, 0, 0, 0, 0, 'default', 8, 'gray', -1, 'false', 'default', ValueList[0], 0, -1, AcqHandle)</l>
+<l>    grab_image_start (AcqHandle, -1)</l>
+<l>    grab_image_async (Image, AcqHandle, -1)</l>
+<l>    get_image_size (Image, Width, Height)</l>
+<c> </c>
+<l>    dev_set_color ('red')</l>
+<l>    draw_rectangle1 (WindowHandle, Row1, Column1, Row2, Column2)</l>
+<l>    gen_rectangle1 (ModelRoi, Row1, Column1, Row2, Column2)</l>
+<l>    reduce_domain (Image, ModelRoi, ImageReduced)</l>
+<c>    </c>
+<c>    **********</c>
+<l>    create_shape_model (ImageReduced, 'auto', -0.39, 0.79, 'auto', 'auto', 'use_polarity', 'auto', 'auto', ModelID)</l>
+<c>  </c>
+<l>*     find_shape_model (ImageReduced, ModelID, -0.39, 0.79, 0.5, 1, 0.5, 'least_squares', 0, 0.9, Row4, Column4, Angle1, Score1)</l>
+<l>    inspect_shape_model (ImageReduced, ModelImages, ModelRegions, 1, 30)</l>
+<c>    </c>
+<l>    get_shape_model_contours (ModelContours, ModelID, 1)</l>
+<c></c>
+<l>    area_center (ModelRoi, Area, Row, Column)</l>
+<c>    </c>
+<l>    disp_obj (Image, WindowHandle)</l>
+<l>    dev_set_color ('blue')</l>
+<l>    disp_obj (ModelRoi, WindowHandle)</l>
+<l>    dev_set_color ('yellow')</l>
+<l>    disp_obj (ModelRegions, WindowHandle)</l>
+<l>    dev_set_color ('green')</l>
+<l>    disp_cross (WindowHandle, Row, Column, Width/24, 0)</l>
+<c>    </c>
+<c>    </c>
+<l>    Robot_X:=[0,0,180]</l>
+<l>    Robot_Y:=[0,180,0]</l>
+<l>    Image_X:=[0,0,90]</l>
+<l>    Image_Y:=[0,90,0]</l>
+<l>    vector_to_hom_mat2d (Image_X, Image_Y, Robot_X, Robot_Y, HomMat2D)</l>
+<c>    </c>
+<l>    while(true)</l>
+<l>        grab_image_async (Image, AcqHandle, -1)</l>
+<c>        </c>
+<l>        find_shape_model (Image, ModelID, -0.39, 0.79, 0.5, 1, 0.5, 'least_squares', 0, 0.9, Row3, Column3, Angle, Score)</l>
+<l>        if(|Score| &gt; 0 and Score&gt;0.5)</l>
+<c>         </c>
+<c>            </c>
+<l>            dev_set_color ('green')</l>
+<l>            disp_cross (WindowHandle, Row3, Column3, Width/24, Angle)</l>
+<l>            affine_trans_point_2d (HomMat2D, Row3, Column3, RobotX, RobotY)</l>
+<l>        endif</l>
+<l>        stop()</l>
+<l>    endwhile</l>
+<l>    close_framegrabber (AcqHandle)</l>
+<l>endif</l>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>
